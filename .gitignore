@@ -1,0 +1,66 @@
+# Fichiers et dossiers générés par le système
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dépendances des gestionnaires de paquets
+node_modules/
+bower_components/
+
+# Environnements de build
+dist/
+build/
+
+# Fichiers de configuration locaux
+.env
+.env.local
+.env.*.local
+
+# Cache IDE/éditeurs
+.idea/
+.vscode/
+*.swp
+
+# Sorties des compilateurs
+*.class
+*.o
+*.so
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Java
+*.jar
+*.war
+*.ear
+
+# Autres fichiers spécifiques
+*.bak
+*.tmp
+*.~*
+
+# Clés SSH ou fichiers sensibles
+*.pem
+*.key
+
+# Pour les projets utilisant des frameworks spécifiques
+# Laravel
+vendor/
+storage/
+.env.testing
+
+# Django
+*.sqlite3
+
+# Angular/React/Vue
+*.map
+coverage/
+
+# Supprimez ce qui est inutile ou ajoutez vos spécificités selon votre projet
