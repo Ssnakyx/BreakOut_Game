@@ -14,3 +14,4 @@ class Paddle:
 
     def draw(self, screen):
         pygame.draw.rect(screen, (255, 255, 255), self.rect)
+"""Test"""

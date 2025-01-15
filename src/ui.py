@@ -50,3 +50,4 @@ class Menu:
 
         pygame.quit()
         return self.difficulty
+"""Test"""

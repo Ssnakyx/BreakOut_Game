@@ -28,3 +28,5 @@ class Ball:
 
     def draw(self, screen):
         pygame.draw.ellipse(screen, (255, 0, 0), self.rect)
+
+"""Test"""

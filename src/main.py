@@ -62,3 +62,4 @@ if __name__ == "__main__":
     selected_difficulty = menu.run_menu()
     game = BreakoutGame(selected_difficulty)
     game.run_game()
+"""Test"""
