@@ -58,14 +58,76 @@ class Brick:
     def draw(self, screen):
         pygame.draw.rect(screen, (0, 255, 0), self.rect)
 
-class BreakoutGame:
+class Menu:
     def __init__(self):
+        self.running = True
+        self.screen = None
+        self.clock = None
+        self.difficulty = 'medium'
+
+    def initialize_menu(self):
+        """Initialise les composants du menu"""
+        pygame.init()
+        self.screen = pygame.display.set_mode((800, 600))
+        pygame.display.set_caption("Breakout Game - Menu")
+        self.clock = pygame.time.Clock()
+
+    def draw_menu(self):
+        """Affiche le menu principal"""
+        self.screen.fill((0, 0, 0))
+
+        font = pygame.font.Font(None, 74)
+        title = font.render("Breakout Game", True, (255, 255, 255))
+        self.screen.blit(title, (200, 100))
+
+        button_font = pygame.font.Font(None, 50)
+        play_button = button_font.render("Play", True, (0, 0, 0), (255, 255, 255))
+        play_button_rect = play_button.get_rect(center=(400, 300))
+        self.screen.blit(play_button, play_button_rect)
+
+        difficulty_button = button_font.render(f"Difficulty: {self.difficulty}", True, (0, 0, 0), (255, 255, 255))
+        difficulty_button_rect = difficulty_button.get_rect(center=(400, 400))
+        self.screen.blit(difficulty_button, difficulty_button_rect)
+
+        return play_button_rect, difficulty_button_rect
+
+    def run_menu(self):
+        """Exécute la boucle principale du menu"""
+        self.initialize_menu()
+
+        while self.running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.play_button_rect.collidepoint(event.pos):
+                        self.running = False
+                        return self.difficulty  # Retourne la difficulté choisie
+                    if self.difficulty_button_rect.collidepoint(event.pos):
+                        # Cycle entre les difficultés
+                        if self.difficulty == 'easy':
+                            self.difficulty = 'medium'
+                        elif self.difficulty == 'medium':
+                            self.difficulty = 'hard'
+                        else:
+                            self.difficulty = 'easy'
+
+            self.play_button_rect, self.difficulty_button_rect = self.draw_menu()
+            pygame.display.flip()
+            self.clock.tick(60)
+
+        pygame.quit()
+        return self.difficulty
+
+class BreakoutGame:
+    def __init__(self, difficulty):
         self.running = True
         self.screen = None
         self.clock = None
         self.paddle = None
         self.ball = None
         self.bricks = []
+        self.difficulty = difficulty
 
     def initialize_game(self):
         """Initialise les composants du jeu"""
@@ -75,7 +137,14 @@ class BreakoutGame:
         self.clock = pygame.time.Clock()
         self.paddle = Paddle()
         self.ball = Ball()
-        self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(5)]
+
+        # Génère les briques selon la difficulté
+        if self.difficulty == 'easy':
+            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(3)]
+        elif self.difficulty == 'medium':
+            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(5)]
+        elif self.difficulty == 'hard':
+            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(7)]
 
     def run_game(self):
         """Exécute la boucle principale du jeu"""
@@ -103,5 +172,7 @@ class BreakoutGame:
         pygame.quit()
 
 if __name__ == "__main__":
-    game = BreakoutGame()
+    menu = Menu()
+    selected_difficulty = menu.run_menu()
+    game = BreakoutGame(selected_difficulty)
     game.run_game()

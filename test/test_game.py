@@ -2,7 +2,7 @@ import sys
 sys.path.append('../src')
 from difficulty_selection import DifficultySelection
 from menu import Menu
-from game import BreakoutGame
+from breakout_game import BreakoutGame
 
 def test_menu():
     """Test du menu principal"""
