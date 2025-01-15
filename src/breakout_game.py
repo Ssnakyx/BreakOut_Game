@@ -43,10 +43,10 @@ class Ball:
                 self.vy *= -1
                 break
 
-        # Réinitialisation si la balle tombe en bas
+        # Retourne False si la balle tombe en bas
         if self.rect.bottom >= 600:
-            self.rect.x, self.rect.y = 395, 295
-            self.vx, self.vy = 4, -4
+            return False
+        return True
 
     def draw(self, screen):
         pygame.draw.ellipse(screen, (255, 0, 0), self.rect)
@@ -146,6 +146,22 @@ class BreakoutGame:
         elif self.difficulty == 'hard':
             self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(7)]
 
+    def draw_game_over(self):
+        """Affiche l'écran de fin de partie avec un bouton rejouer"""
+        self.screen.fill((0, 0, 0))
+
+        font = pygame.font.Font(None, 74)
+        game_over_text = font.render("Game Over", True, (255, 0, 0))
+        self.screen.blit(game_over_text, (250, 200))
+
+        button_font = pygame.font.Font(None, 50)
+        replay_button = button_font.render("Replay", True, (0, 0, 0), (255, 255, 255))
+        replay_button_rect = replay_button.get_rect(center=(400, 400))
+        self.screen.blit(replay_button, replay_button_rect)
+
+        pygame.display.flip()
+        return replay_button_rect
+
     def run_game(self):
         """Exécute la boucle principale du jeu"""
         self.initialize_game()
@@ -157,7 +173,19 @@ class BreakoutGame:
 
             keys = pygame.key.get_pressed()
             self.paddle.update(keys)
-            self.ball.update(self.paddle, self.bricks)
+            ball_active = self.ball.update(self.paddle, self.bricks)
+
+            if not ball_active:  # Si la balle tombe, fin de partie
+                replay_rect = self.draw_game_over()
+                while True:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            self.running = False
+                            return
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if replay_rect.collidepoint(event.pos):
+                                self.run_game()  # Relance le jeu
+                                return
 
             self.screen.fill((0, 0, 0))  # Remplit l'écran de noir
             self.paddle.draw(self.screen)
