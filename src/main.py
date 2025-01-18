@@ -20,8 +20,8 @@ class BreakoutGame:
     def load_sounds(self):
         """Charge les effets sonores depuis le dossier sound"""
         sound_path = os.path.join("sound")  # Chemin vers le dossier sound
-        self.sounds['paddle_hit'] = pygame.mixer.Sound(os.path.join(sound_path, "Ball.mp3"))
-        self.sounds['brick_break'] = pygame.mixer.Sound(os.path.join(sound_path, "brick.mp3"))
+        self.sounds['paddle_hit'] = pygame.mixer.Sound("data/sound/Ball.mp3")#os.path.join(sound_path, "Ball.mp3"))
+        self.sounds['brick_break'] = pygame.mixer.Sound("data/sound/brick.mp3")#os.path.join(sound_path, "brick.mp3"))
 
     def initialize_game(self):
         """Initialise les composants du jeu"""
