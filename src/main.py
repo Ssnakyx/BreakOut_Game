@@ -6,36 +6,6 @@ from bonus import Bonus
 import pygame
 
 class BreakoutGame:
-    # def __init__(self, difficulty):
-    #     self.running = True
-    #     self.screen = None
-    #     self.clock = None
-    #     self.paddle = None
-    #     self.balls = None
-    #     self.bricks = []
-    #     self.difficulty = difficulty
-    #     self.score = 0
-    #     self.bonuses = []  
-
-
-    # def initialize_game(self):
-    #     """Initialise les composants du jeu"""
-    #     pygame.init()
-    #     self.screen = pygame.display.set_mode((800, 600))
-    #     pygame.display.set_caption("Breakout Game")
-    #     self.clock = pygame.time.Clock()
-    #     self.paddle = Paddle()
-    #     self.balls = [Ball()]  # Liste de balles
-    #     # self.bricks = []
-
-    #     # Génération des briques selon la difficulté
-    #     if self.difficulty == 'easy':
-    #         self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(3)]
-    #     elif self.difficulty == 'medium':
-    #         self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(5)]
-    #     elif self.difficulty == 'hard':
-    #         self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(7)]
-
     def __init__(self, difficulty):
         self.running = True
         self.screen = None
@@ -47,7 +17,9 @@ class BreakoutGame:
         self.score = 0
         self.bonuses = []
 
+
     def initialize_game(self):
+        """Initialise les composants du jeu"""
         pygame.init()
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Breakout Game")
@@ -56,8 +28,12 @@ class BreakoutGame:
         self.balls = [Ball()]
 
         # Génération des briques selon la difficulté
-        rows = {"easy": 3, "medium": 5, "hard": 7}[self.difficulty]
-        self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(rows)]
+        if self.difficulty == 'easy':
+            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(3)]
+        elif self.difficulty == 'medium':
+            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(5)]
+        elif self.difficulty == 'hard':
+            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(7)]
 
     def run_game(self):
         self.initialize_game()
@@ -90,9 +66,24 @@ class BreakoutGame:
                 elif not bonus.active:
                     self.bonuses.remove(bonus)
 
+            # Mise à jour du score et fin de partie
+            if not self.balls:#ball_active:
+                replay_rect, main_menu_rect = self.draw_game_over()
+                while True:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            self.running = False
+                            return
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if replay_rect.collidepoint(event.pos):
+                                self.run_game()  # Relance le jeu
+                                return
+                            if main_menu_rect.collidepoint(event.pos):
+                                return  # Retourne au menu principal
+
             # Fin de partie si aucune balle
-            if not self.balls:
-                self.running = False
+            # if not self.balls:
+            #     self.running = False
 
             # Dessin des éléments
             self.screen.fill((0, 0, 0))
@@ -103,7 +94,9 @@ class BreakoutGame:
                 brick.draw(self.screen)
             for bonus in self.bonuses:
                 bonus.draw(self.screen)
-
+                
+            # Met à jour le score en fonction des briques restantes
+            self.score = (30 - len(self.bricks)) * 10
             pygame.display.flip()
             self.clock.tick(60)
 
