@@ -20,7 +20,6 @@ class BreakoutGame:
         self.difficulty = difficulty
         self.score = 0
         self.sounds = {}
-        self.score = 0
         self.bonuses = []
 
     def load_sounds(self):
@@ -75,6 +74,31 @@ class BreakoutGame:
         pygame.display.flip()
         return replay_button_rect, main_menu_button_rect
 
+    def draw_victory_screen(self):
+        self.screen.fill((0, 0, 0))
+
+        font_title = pygame.font.Font(None, 74)
+        victory_text = font_title.render("Victory!", True, (0, 255, 0))
+        self.screen.blit(victory_text, (300, 150))
+
+        font_score = pygame.font.Font(None, 50)
+        score_text = font_score.render(f"Score: {self.score}", True, (255, 255, 255))
+        self.screen.blit(score_text, (300, 250))
+
+        button_font = pygame.font.Font(None, 40)
+        replay_button = button_font.render("Replay", True, (0, 0, 0), (255, 255, 255))
+        replay_button_rect = replay_button.get_rect(center=(400, 350))
+        pygame.draw.rect(self.screen, (50, 150, 50), replay_button_rect.inflate(20, 10), border_radius=10)
+        self.screen.blit(replay_button, replay_button_rect)
+
+        main_menu_button = button_font.render("Main Menu", True, (0, 0, 0), (255, 255, 255))
+        main_menu_button_rect = main_menu_button.get_rect(center=(400, 450))
+        pygame.draw.rect(self.screen, (150, 50, 50), main_menu_button_rect.inflate(20, 10), border_radius=10)
+        self.screen.blit(main_menu_button, main_menu_button_rect)
+
+        pygame.display.flip()
+        return replay_button_rect, main_menu_button_rect
+
     def run_game(self):
         self.initialize_game()
 
@@ -102,7 +126,7 @@ class BreakoutGame:
                     self.bonuses.remove(bonus)
 
             if not self.balls:
-                self.save_score()
+                self.save_score()  
                 replay_rect, main_menu_rect = self.draw_game_over()
                 while True:
                     for event in pygame.event.get():
@@ -115,7 +139,22 @@ class BreakoutGame:
                                 return
                             if main_menu_rect.collidepoint(event.pos):
                                 return  
-       
+
+            if len(self.bricks) == 0:
+                self.save_score()  
+                replay_rect, main_menu_rect = self.draw_victory_screen()
+                while True:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            self.running = False
+                            return
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if replay_rect.collidepoint(event.pos):
+                                self.run_game()  
+                                return
+                            if main_menu_rect.collidepoint(event.pos):
+                                return 
+        
             self.screen.fill((0, 0, 0))
             self.paddle.draw(self.screen)
             for ball in self.balls:
