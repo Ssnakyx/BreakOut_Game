@@ -75,7 +75,7 @@ class Ball:
                 self.vy *= -1
 
                 # 20% de chance de générer un bonus
-                if random.random() < 1:
+                if random.random() < 1:#0.20:#20%
                     bonus_type = random.choice(["expand", "extra_ball"])
                     bonuses.append(Bonus(brick.rect.x + brick.rect.width // 2, brick.rect.y, bonus_type))
                 break

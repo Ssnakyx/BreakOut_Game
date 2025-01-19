@@ -7,7 +7,7 @@ class Paddle:
         self.rect = pygame.Rect(350, 550, 100, 10)
         self.original_width = self.rect.width
         self.expanded_time = None  # Temps de début de l'agrandissement
-        self.expanded_duration = 15  # Durée de l'agrandissement (en secondes)
+        self.expanded_duration = 20  # Durée de l'agrandissement (en secondes)
         # self.color = (255, 255, 255)  # Couleur de la raquette
         # self.speed = 5  # Vitesse de déplacement
 
@@ -24,7 +24,8 @@ class Paddle:
     def expand(self, extra_width):
         """Agrandit la largeur de la raquette pour une durée limitée."""
         if not self.expanded_time:  
-            self.expanded_time = time.time()        
+            self.expanded_time = time.time() 
+        self.rect.width = self.original_width
         self.rect.width += extra_width
 
         # S'assurer que la raquette reste à l'intérieur de l'écran

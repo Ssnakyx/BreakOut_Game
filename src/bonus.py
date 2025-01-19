@@ -8,7 +8,7 @@ class Bonus:
         self.width = 20
         self.height = 20
         self.bonus_type = bonus_type  # "expand" ou "extra_ball"
-        self.color = (0, 255, 0) if bonus_type == "expand" else (0, 0, 255)
+        self.color = (255, 255, 0) if bonus_type == "expand" else (0, 0, 255)
         self.falling_speed = 2
         self.active = True
 
