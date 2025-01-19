@@ -59,11 +59,11 @@ class BreakoutGame:
 
             keys = pygame.key.get_pressed()
             self.paddle.update(keys)
-            ball_active = self.ball.update(self.paddle, self.bricks)
+            # ball_active = self.balls.update(self.paddle, self.bricks)
 
             # Mise à jour des balles
             for ball in self.balls[:]:
-                ball_active = ball.update(self.paddle, self.bricks, self.bonuses)
+                ball_active = ball.update(self.paddle, self.bricks, self.sounds, self.bonuses)
                 if not ball_active:
                     self.balls.remove(ball)
 
