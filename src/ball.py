@@ -5,6 +5,8 @@ class Ball:
         self.rect = pygame.Rect(395, 295, 10, 10)
         self.vx = 4
         self.vy = -4
+        self.image = pygame.image.load('data/img/ball.jpg') 
+        self.image = pygame.transform.scale(self.image, (20, 20)) 
 
     def update(self, paddle, bricks, sounds):
         self.rect.x += self.vx
@@ -15,10 +17,11 @@ class Ball:
 
         if self.rect.top <= 0:
             self.vy *= -1
+
         if self.rect.colliderect(paddle.rect):
             self.vy *= -1
             if 'paddle_hit' in sounds:
-                sounds['paddle_hit'].play()  
+                sounds['paddle_hit'].play() 
 
         for brick in bricks[:]:
             if self.rect.colliderect(brick.rect):
@@ -27,11 +30,11 @@ class Ball:
                 if 'brick_break' in sounds:
                     sounds['brick_break'].play() 
                 break
-            
+
         if self.rect.bottom >= 600:
             return False
 
         return True
 
     def draw(self, screen):
-        pygame.draw.ellipse(screen, (255, 0, 0), self.rect)
+        screen.blit(self.image, self.rect) 
