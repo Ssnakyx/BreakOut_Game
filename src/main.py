@@ -35,6 +35,8 @@ class BreakoutGame:
     def initialize_game(self):
         """Initialise les composants du jeu"""
         pygame.init()
+        pygame.mixer.init()  # Initialisation pour les sons
+        self.load_sounds()
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Breakout Game")
         self.clock = pygame.time.Clock()
