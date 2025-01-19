@@ -2,6 +2,7 @@ from ui import Menu
 from paddle import Paddle
 from ball import Ball
 from bricks import Brick
+from bonus import Bonus
 import pygame
 
 class BreakoutGame:
@@ -10,10 +11,12 @@ class BreakoutGame:
         self.screen = None
         self.clock = None
         self.paddle = None
-        self.ball = None
+        self.balls = None
         self.bricks = []
         self.difficulty = difficulty
         self.score = 0
+        self.bonuses = []  
+
 
     def initialize_game(self):
         """Initialise les composants du jeu"""
@@ -22,7 +25,8 @@ class BreakoutGame:
         pygame.display.set_caption("Breakout Game")
         self.clock = pygame.time.Clock()
         self.paddle = Paddle()
-        self.ball = Ball()
+        self.balls = [Ball()]  # Liste de balles
+        # self.bricks = []
 
         # Génération des briques selon la difficulté
         if self.difficulty == 'easy':
@@ -67,16 +71,36 @@ class BreakoutGame:
         self.initialize_game()
 
         while self.running:
+            for bonus in self.bonuses:
+                if isinstance(bonus, Bonus):
+                    bonus.update()
+                    bonus.draw(self.screen)
+
+
+                # Vérifier collision avec la raquette
+                if bonus.active and bonus.y + bonus.height >= self.paddle.rect.y:
+                    if self.paddle.rect.colliderect(pygame.Rect(bonus.x, bonus.y, bonus.width, bonus.height)):
+                        bonus.active = False
+                        if bonus.bonus_type == "expand":
+                            self.paddle.expand(50)  # Augmente la largeur de la raquette de 50 pixels
+                        elif bonus.bonus_type == "extra_ball":
+                            self.balls.append(Ball())  # Ajoute une nouvelle balle
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
 
             keys = pygame.key.get_pressed()
             self.paddle.update(keys)
-            ball_active = self.ball.update(self.paddle, self.bricks)
-
+            
+            # ball_active = self.ball.update(self.paddle, self.bricks, self.bonuses)
+        # Mise à jour des balles
+            for ball in self.balls[:]:  # Copie de la liste pour itérer en sécurité
+                ball_active = ball.update(self.paddle, self.bricks, self.bonuses)
+                if not ball_active:
+                    self.balls.remove(ball)
             # Mise à jour du score et fin de partie
-            if not ball_active:
+            if not self.balls:#ball_active:
                 replay_rect, main_menu_rect = self.draw_game_over()
                 while True:
                     for event in pygame.event.get():
@@ -92,7 +116,9 @@ class BreakoutGame:
 
             self.screen.fill((0, 0, 0))
             self.paddle.draw(self.screen)
-            self.ball.draw(self.screen)
+            # self.ball.draw(self.screen)
+            for ball in self.balls:
+                ball.draw(self.screen)
 
             for brick in self.bricks:
                 brick.draw(self.screen)
