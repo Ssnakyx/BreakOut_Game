@@ -15,12 +15,19 @@ Un jeu classique de type *Breakout* où vous contrôlez une palette pour renvoye
    git clone https://github.com/votre-compte/Breakout_Game.git
    cd Breakout_Game
 
-2. Installez les dépendances nécessaires avec pip :
+2. Installer Python et visual studio code :
+    Python : https://www.python.org/downloads/
+    VsCode : https://code.visualstudio.com/download
+        Ou installer directement l'extension python dans VS Code
+
+3. Installez les dépendances nécessaires avec pip :
 
        ```bash
        pip install -r requirements.txt
+       OU faite :
+       pip install pygame
 
-3. Lancer le jeu 
+4. Lancer le jeu 
     ```bash
     python src/main.py
 

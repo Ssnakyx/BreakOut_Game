@@ -8,10 +8,9 @@ class Paddle:
         self.image = pygame.image.load('data/img/barre.jpg') 
         self.image = pygame.transform.scale(self.image, (100, 10))
         self.original_width = self.rect.width
-        self.expanded_time = None  # Temps de début de l'agrandissement
-        self.expanded_duration = 20  # Durée de l'agrandissement (en secondes)
-        # self.color = (255, 255, 255)  # Couleur de la raquette
-        # self.speed = 5  # Vitesse de déplacement
+        self.expanded_time = None  
+        self.expanded_duration = 20  
+       
 
     def update(self, keys):
         if keys[pygame.K_LEFT]:
@@ -24,20 +23,17 @@ class Paddle:
             self.reset_width()
         
     def expand(self, extra_width):
-        """Agrandit la largeur de la raquette pour une durée limitée."""
         if not self.expanded_time:  
             self.expanded_time = time.time() 
         self.rect.width = self.original_width
         self.rect.width += extra_width
 
-        # S'assurer que la raquette reste à l'intérieur de l'écran
-        self.rect.width = min(self.rect.width, 800)  # Limite maximale
+        self.rect.width = min(self.rect.width, 800) 
         self.rect.x = min(self.rect.x, 800 - self.rect.width)
         
     def reset_width(self):
-        """Réinitialise la largeur de la raquette à sa taille d'origine."""
         self.rect.width = self.original_width
-        self.expanded_time = None  # Réinitialise le chronomètre
+        self.expanded_time = None  
         
     def draw(self, screen):
         screen.blit(self.image, self.rect) 

@@ -13,7 +13,6 @@ class Menu:
         self.scores_button_rect = None 
 
     def initialize_menu(self):
-        """Initialise le menu"""
         pygame.init()
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Breakout Game - Menu")
@@ -105,7 +104,6 @@ class Menu:
                         return
 
     def run_menu(self):
-        """Exécute le menu principal"""
         self.initialize_menu()
 
         while self.running:
