@@ -1,5 +1,6 @@
 import pygame
 import sys
+import csv
 
 class Menu:
     def __init__(self):
@@ -9,6 +10,7 @@ class Menu:
         self.difficulty = 'easy'
         self.play_button_rect = None
         self.difficulty_button_rect = None
+        self.scores_button_rect = None  # Nouveau bouton pour voir les scores
 
     def initialize_menu(self):
         """Initialise le menu"""
@@ -47,29 +49,71 @@ class Menu:
 
     def draw_menu(self):
         """Affiche le menu principal"""
-        self.screen.fill((30, 30, 30))  # Fond du menu
+        self.screen.fill((30, 30, 30))
 
-        # Titre
         font_title = pygame.font.Font(pygame.font.match_font("arial", bold=True), 50)
         title = font_title.render("Breakout Game", True, (255, 255, 255))
         title_rect = title.get_rect(center=(400, 100))
         self.screen.blit(title, title_rect)
 
-        # Police pour les boutons
         button_font = pygame.font.Font(pygame.font.match_font("arial"), 30)
 
-        # Bouton "Play"
         play_button_rect = pygame.Rect(300, 200, 200, 50)
         self.draw_rounded_button("Play", play_button_rect, (50, 150, 50), (255, 255, 255), button_font)
 
-        # Bouton "Difficulty"
         difficulty_button_rect = pygame.Rect(300, 300, 200, 50)
         self.draw_rounded_button(f"Difficulty: {self.difficulty}", difficulty_button_rect, (150, 50, 50), (255, 255, 255), button_font)
 
-        # Dessiner la boîte de description
+        scores_button_rect = pygame.Rect(300, 400, 200, 50)
+        self.draw_rounded_button("View Scores", scores_button_rect, (50, 50, 150), (255, 255, 255), button_font)
+
         self.draw_description_box()
 
-        return play_button_rect, difficulty_button_rect
+        return play_button_rect, difficulty_button_rect, scores_button_rect
+
+    def show_scores(self):
+        """Affiche les scores sauvegardés"""
+        self.screen.fill((30, 30, 30))
+
+        # Titre
+        font_title = pygame.font.Font(pygame.font.match_font("arial", bold=True), 50)
+        title = font_title.render("High Scores", True, (255, 255, 255))
+        title_rect = title.get_rect(center=(400, 100))
+        self.screen.blit(title, title_rect)
+
+        # Chargement des scores depuis le fichier CSV
+        try:
+            with open('score.csv', mode='r') as file:
+                reader = csv.reader(file)
+                scores = sorted([int(row[0]) for row in reader], reverse=True)
+        except FileNotFoundError:
+            scores = []
+
+        # Affichage des scores
+        font_score = pygame.font.Font(pygame.font.match_font("arial"), 30)
+        y_position = 200
+        for idx, score in enumerate(scores[:10]):  # Afficher les 10 premiers scores
+            score_text = font_score.render(f"{idx + 1}. {score}", True, (255, 255, 255))
+            score_rect = score_text.get_rect(center=(400, y_position))
+            self.screen.blit(score_text, score_rect)
+            y_position += 40
+
+        # Bouton pour revenir au menu
+        back_button_rect = pygame.Rect(300, y_position, 200, 50)
+        self.draw_rounded_button("Back to Menu", back_button_rect, (150, 50, 50), (255, 255, 255), font_score)
+
+        pygame.display.flip()
+
+        # Attente de l'interaction de l'utilisateur
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if back_button_rect.collidepoint(event.pos):
+                        return
 
     def run_menu(self):
         """Exécute le menu principal"""
@@ -87,26 +131,19 @@ class Menu:
                         self.running = False
                         return self.difficulty
                     if self.difficulty_button_rect.collidepoint(event.pos):
-                        # Cycle entre les difficultés
                         if self.difficulty == 'easy':
                             self.difficulty = 'medium'
                         elif self.difficulty == 'medium':
                             self.difficulty = 'hard'
                         else:
                             self.difficulty = 'easy'
+                    if self.scores_button_rect.collidepoint(event.pos):
+                        self.show_scores()
 
-            # Dessine le menu et met à jour les rectangles des boutons
-            self.play_button_rect, self.difficulty_button_rect = self.draw_menu()
+            self.play_button_rect, self.difficulty_button_rect, self.scores_button_rect = self.draw_menu()
 
-            # Met à jour l'affichage
             pygame.display.flip()
             self.clock.tick(60)
 
         pygame.quit()
         return self.difficulty
-
-# Test du menu
-if __name__ == "__main__":
-    menu = Menu()
-    selected_difficulty = menu.run_menu()
-    print(f"Difficulté sélectionnée : {selected_difficulty}")

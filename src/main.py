@@ -3,6 +3,7 @@ from paddle import Paddle
 from ball import Ball
 from bricks import Brick
 import pygame
+import csv
 
 class BreakoutGame:
     def __init__(self, difficulty):
@@ -31,6 +32,12 @@ class BreakoutGame:
             self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(5)]
         elif self.difficulty == 'hard':
             self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(7)]
+
+    def save_score(self):
+        """Enregistre le score dans le fichier score.csv"""
+        with open('score.csv', mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([self.score])
 
     def draw_game_over(self):
         """Affiche l'écran Game Over avec le score et les options"""
@@ -75,8 +82,8 @@ class BreakoutGame:
             self.paddle.update(keys)
             ball_active = self.ball.update(self.paddle, self.bricks)
 
-            # Mise à jour du score et fin de partie
             if not ball_active:
+                self.save_score()  # Sauvegarde du score à la fin de la partie
                 replay_rect, main_menu_rect = self.draw_game_over()
                 while True:
                     for event in pygame.event.get():
@@ -97,7 +104,6 @@ class BreakoutGame:
             for brick in self.bricks:
                 brick.draw(self.screen)
 
-            # Met à jour le score en fonction des briques restantes
             self.score = (30 - len(self.bricks)) * 10
 
             pygame.display.flip()
