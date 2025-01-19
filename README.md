@@ -6,8 +6,6 @@ Un jeu classique de type *Breakout* où vous contrôlez une palette pour renvoye
 ## Table des matières
 - [Installation](#installation)
 - [Comment jouer](#comment-jouer)
-- [Dépendances](#dépendances)
-- [Fichiers audio](#fichiers-audio)
 
 ## Installation
 
