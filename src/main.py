@@ -6,6 +6,36 @@ from bonus import Bonus
 import pygame
 
 class BreakoutGame:
+    # def __init__(self, difficulty):
+    #     self.running = True
+    #     self.screen = None
+    #     self.clock = None
+    #     self.paddle = None
+    #     self.balls = None
+    #     self.bricks = []
+    #     self.difficulty = difficulty
+    #     self.score = 0
+    #     self.bonuses = []  
+
+
+    # def initialize_game(self):
+    #     """Initialise les composants du jeu"""
+    #     pygame.init()
+    #     self.screen = pygame.display.set_mode((800, 600))
+    #     pygame.display.set_caption("Breakout Game")
+    #     self.clock = pygame.time.Clock()
+    #     self.paddle = Paddle()
+    #     self.balls = [Ball()]  # Liste de balles
+    #     # self.bricks = []
+
+    #     # Génération des briques selon la difficulté
+    #     if self.difficulty == 'easy':
+    #         self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(3)]
+    #     elif self.difficulty == 'medium':
+    #         self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(5)]
+    #     elif self.difficulty == 'hard':
+    #         self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(7)]
+
     def __init__(self, difficulty):
         self.running = True
         self.screen = None
@@ -15,26 +45,69 @@ class BreakoutGame:
         self.bricks = []
         self.difficulty = difficulty
         self.score = 0
-        self.bonuses = []  
-
+        self.bonuses = []
 
     def initialize_game(self):
-        """Initialise les composants du jeu"""
         pygame.init()
         self.screen = pygame.display.set_mode((800, 600))
         pygame.display.set_caption("Breakout Game")
         self.clock = pygame.time.Clock()
         self.paddle = Paddle()
-        self.balls = [Ball()]  # Liste de balles
-        # self.bricks = []
+        self.balls = [Ball()]
 
         # Génération des briques selon la difficulté
-        if self.difficulty == 'easy':
-            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(3)]
-        elif self.difficulty == 'medium':
-            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(5)]
-        elif self.difficulty == 'hard':
-            self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(7)]
+        rows = {"easy": 3, "medium": 5, "hard": 7}[self.difficulty]
+        self.bricks = [Brick(x * 80 + 5, y * 30 + 5, 70, 20) for x in range(10) for y in range(rows)]
+
+    def run_game(self):
+        self.initialize_game()
+
+        while self.running:
+            # Gestion des événements
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+
+            keys = pygame.key.get_pressed()
+            self.paddle.update(keys)
+
+            # Mise à jour des balles
+            for ball in self.balls[:]:
+                ball_active = ball.update(self.paddle, self.bricks, self.bonuses)
+                if not ball_active:
+                    self.balls.remove(ball)
+
+            # Mise à jour des bonus
+            for bonus in self.bonuses[:]:
+                bonus.update()
+                if bonus.active and bonus.y + bonus.height >= self.paddle.rect.y:
+                    if self.paddle.rect.colliderect(pygame.Rect(bonus.x, bonus.y, bonus.width, bonus.height)):
+                        bonus.active = False
+                        if bonus.bonus_type == "expand":
+                            self.paddle.expand(50)
+                        elif bonus.bonus_type == "extra_ball":
+                            self.balls.append(Ball())
+                elif not bonus.active:
+                    self.bonuses.remove(bonus)
+
+            # Fin de partie si aucune balle
+            if not self.balls:
+                self.running = False
+
+            # Dessin des éléments
+            self.screen.fill((0, 0, 0))
+            self.paddle.draw(self.screen)
+            for ball in self.balls:
+                ball.draw(self.screen)
+            for brick in self.bricks:
+                brick.draw(self.screen)
+            for bonus in self.bonuses:
+                bonus.draw(self.screen)
+
+            pygame.display.flip()
+            self.clock.tick(60)
+
+        pygame.quit()
 
     def draw_game_over(self):
         """Affiche l'écran Game Over avec le score et les options"""
@@ -66,70 +139,70 @@ class BreakoutGame:
         pygame.display.flip()
         return replay_button_rect, main_menu_button_rect
 
-    def run_game(self):
-        """Exécute la boucle principale du jeu"""
-        self.initialize_game()
+    # def run_game(self):
+    #     """Exécute la boucle principale du jeu"""
+    #     self.initialize_game()
 
-        while self.running:
-            for bonus in self.bonuses:
-                if isinstance(bonus, Bonus):
-                    bonus.update()
-                    bonus.draw(self.screen)
+    #     while self.running:
+    #         for bonus in self.bonuses:
+    #             if isinstance(bonus, Bonus):
+    #                 bonus.update()
+    #                 bonus.draw(self.screen)
 
 
-                # Vérifier collision avec la raquette
-                if bonus.active and bonus.y + bonus.height >= self.paddle.rect.y:
-                    if self.paddle.rect.colliderect(pygame.Rect(bonus.x, bonus.y, bonus.width, bonus.height)):
-                        bonus.active = False
-                        if bonus.bonus_type == "expand":
-                            self.paddle.expand(50)  # Augmente la largeur de la raquette de 50 pixels
-                        elif bonus.bonus_type == "extra_ball":
-                            self.balls.append(Ball())  # Ajoute une nouvelle balle
+    #             # Vérifier collision avec la raquette
+    #             if bonus.active and bonus.y + bonus.height >= self.paddle.rect.y:
+    #                 if self.paddle.rect.colliderect(pygame.Rect(bonus.x, bonus.y, bonus.width, bonus.height)):
+    #                     bonus.active = False
+    #                     if bonus.bonus_type == "expand":
+    #                         self.paddle.expand(50)  # Augmente la largeur de la raquette de 50 pixels
+    #                     elif bonus.bonus_type == "extra_ball":
+    #                         self.balls.append(Ball())  # Ajoute une nouvelle balle
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
+    #         for event in pygame.event.get():
+    #             if event.type == pygame.QUIT:
+    #                 self.running = False
 
-            keys = pygame.key.get_pressed()
-            self.paddle.update(keys)
+    #         keys = pygame.key.get_pressed()
+    #         self.paddle.update(keys)
             
-            # ball_active = self.ball.update(self.paddle, self.bricks, self.bonuses)
-        # Mise à jour des balles
-            for ball in self.balls[:]:  # Copie de la liste pour itérer en sécurité
-                ball_active = ball.update(self.paddle, self.bricks, self.bonuses)
-                if not ball_active:
-                    self.balls.remove(ball)
-            # Mise à jour du score et fin de partie
-            if not self.balls:#ball_active:
-                replay_rect, main_menu_rect = self.draw_game_over()
-                while True:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            self.running = False
-                            return
-                        if event.type == pygame.MOUSEBUTTONDOWN:
-                            if replay_rect.collidepoint(event.pos):
-                                self.run_game()  # Relance le jeu
-                                return
-                            if main_menu_rect.collidepoint(event.pos):
-                                return  # Retourne au menu principal
+    #         # ball_active = self.ball.update(self.paddle, self.bricks, self.bonuses)
+    #     # Mise à jour des balles
+    #         for ball in self.balls[:]:  # Copie de la liste pour itérer en sécurité
+    #             ball_active = ball.update(self.paddle, self.bricks, self.bonuses)
+    #             if not ball_active:
+    #                 self.balls.remove(ball)
+    #         # Mise à jour du score et fin de partie
+    #         if not self.balls:#ball_active:
+    #             replay_rect, main_menu_rect = self.draw_game_over()
+    #             while True:
+    #                 for event in pygame.event.get():
+    #                     if event.type == pygame.QUIT:
+    #                         self.running = False
+    #                         return
+    #                     if event.type == pygame.MOUSEBUTTONDOWN:
+    #                         if replay_rect.collidepoint(event.pos):
+    #                             self.run_game()  # Relance le jeu
+    #                             return
+    #                         if main_menu_rect.collidepoint(event.pos):
+    #                             return  # Retourne au menu principal
 
-            self.screen.fill((0, 0, 0))
-            self.paddle.draw(self.screen)
-            # self.ball.draw(self.screen)
-            for ball in self.balls:
-                ball.draw(self.screen)
+    #         self.screen.fill((0, 0, 0))
+    #         self.paddle.draw(self.screen)
+    #         # self.ball.draw(self.screen)
+    #         for ball in self.balls:
+    #             ball.draw(self.screen)
 
-            for brick in self.bricks:
-                brick.draw(self.screen)
+    #         for brick in self.bricks:
+    #             brick.draw(self.screen)
 
-            # Met à jour le score en fonction des briques restantes
-            self.score = (30 - len(self.bricks)) * 10
+    #         # Met à jour le score en fonction des briques restantes
+    #         self.score = (30 - len(self.bricks)) * 10
 
-            pygame.display.flip()
-            self.clock.tick(60)
+    #         pygame.display.flip()
+    #         self.clock.tick(60)
 
-        pygame.quit()
+    #     pygame.quit()
 
 if __name__ == "__main__":
     while True:
